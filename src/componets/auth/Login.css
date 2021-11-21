@@ -1,0 +1,39 @@
+.login {
+  margin: auto;
+  max-width: 50%;
+  position: fixed;
+  width: 100%;
+  top: 30%;
+  left: 50%;
+  transform: translateY(-30%) translateX(-50%);
+  background: white;
+  border: 0.001rem solid #dbdbdb;
+}
+
+.login .title {
+  text-align: center;
+  font-size: 2em;
+  letter-spacing: 5px;
+}
+
+.login .backHome {
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
+.login .linkToRegister {
+  margin-left: 16.66666667%;
+}
+
+.alert-dev {
+  max-width: 375px;
+  margin: auto;
+  margin-top: 2px;
+}
+
+@media only screen and (max-width: 992px) {
+  .login {
+    max-width: 100%;
+  }
+}

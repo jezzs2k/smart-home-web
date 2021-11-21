@@ -1,0 +1,57 @@
+.right-content {
+  position: relative;
+  padding-left: 20px;
+}
+
+.right-content .info-user {
+  cursor: pointer;
+}
+
+.right-content .info-user .avatar-jezzs {
+  width: 60px;
+  height: 60px;
+}
+
+.ant-card-meta-detail > div:not(:last-child) {
+  margin: 0;
+}
+
+.right-content .top {
+  margin: 15px 0;
+}
+
+.right-content .top .title {
+  font-size: 1rem;
+}
+
+.right-content .top .title,
+.right-content .top .action-btn {
+  display: inline-block;
+  padding: 0;
+  margin: 0;
+  color: #8e8e8e;
+}
+
+.right-content .top .action-btn {
+  float: right;
+  color: #262626;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.right-content .follow-btn {
+  color: #1890ff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.right-content .list-item {
+  padding: 5px 0;
+  border: none;
+  margin: 0;
+}
+
+.right-content .bottom .info-app {
+  color: #c7c7c7;
+  max-width: 70%;
+}

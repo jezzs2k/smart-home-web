@@ -1,0 +1,22 @@
+.instagram-app {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.instagram-app .text-logo {
+  font-size: 3rem;
+  font-family: 'Kaushan Script', cursive;
+}
+
+.instagram-app .action .btn-login,
+.instagram-app .action .btn-register {
+  margin: 0 10px;
+}
+
+.instagram-app .action .btn-login a {
+  padding: 10px;
+}

@@ -1,0 +1,96 @@
+.navbar {
+  width: 100%;
+  margin: auto;
+  background: #ffffff;
+  display: flex;
+  max-width: 80%;
+}
+
+.navbar .logo {
+  flex-grow: 1;
+  width: 20%;
+  align-items: center;
+}
+
+.navbar .logo,
+.navbar .logo h2 {
+  display: flex;
+  font-family: 'Kaushan Script', cursive;
+}
+
+.navbar .search {
+  flex-grow: 1;
+  width: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.navbar .search .search-form {
+  border: 1px solid #d9d9d9;
+  background: #fafafa;
+  outline: none;
+  box-shadow: none;
+  height: 26px;
+}
+
+.navbar .search .search-form input {
+  background: #fafafa;
+  height: 100%;
+}
+
+.navbar .nav-navbar {
+  flex-grow: 1;
+  width: 30%;
+}
+
+.navbar .nav-child {
+  padding: 0 10px;
+}
+
+.navbar .icon {
+  font-size: 1.2rem;
+  padding: 0 !important;
+  color: #595959;
+}
+
+.navbar .avatar-jezzs {
+  margin-bottom: 8px;
+  width: 25px;
+  height: 25px;
+}
+
+.modal {
+  margin: 0;
+}
+
+.modal .modal-item {
+  cursor: pointer;
+}
+
+.modal .text {
+  display: inline-block;
+  padding: 0 10px;
+}
+
+.modal .logout {
+  border-top: 1px solid #d9d9d9;
+}
+
+@media only screen and (max-width: 992px) {
+  .navbar {
+    max-width: 100%;
+  }
+}
+
+@media only screen and (max-width: 768px) {
+  .navbar .search {
+    display: none;
+  }
+
+  .navbar .nav-navbar {
+    width: 80%;
+    display: flex;
+    justify-content: flex-end;
+  }
+}
