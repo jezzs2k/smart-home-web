@@ -1,10 +1,11 @@
-import React, { Fragment } from 'react';
-import { connect } from 'react-redux';
-
+import {useEffect} from 'react';
 import { Form, Input, Button, Checkbox, Alert } from 'antd';
-import { Link, Redirect } from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
 
 import './Login.css';
+import { RootState, useAppDispatch } from '../../stores/stores';
+import { login } from '../../stores/factories/login';
+import { useSelector } from 'react-redux';
 
 const layout = {
   labelCol: {
@@ -22,17 +23,24 @@ const tailLayout = {
 };
 
 const LoginForm = ({  }) => {
+  const {token} = useSelector((state: RootState) => state.auth);
+  const dispatch = useAppDispatch();
+  let navigate = useNavigate();
 
-  const onFinish = (values) => {
-    console.log('Success:', values);
-    // Login({ email: values.email, password: values.password });
-    // history.push('/');
+  const onFinish = (values: {username: string, password: string}) => {
+    dispatch(login(values));
   };
 
   const onFinishFailed = () => {
     // Error(errorInfo);
     // console.log('Failed:', errorInfo);
   };
+
+  useEffect(() => {
+    if (token) {
+      navigate('/', {replace: true});
+    }
+  }, [token])
 
 
   return (<div className='login'>
@@ -46,45 +54,41 @@ const LoginForm = ({  }) => {
           onFinish={onFinish}
           onFinishFailed={onFinishFailed}>
           <Form.Item
-            label='Email'
-            name='email'
+            label='Tên tài khoản'
+            name='username'
             rules={[
               {
                 required: true,
-                message: 'Please input your email!',
+                message: 'Nhập tài khoản!',
               },
             ]}>
             <Input />
           </Form.Item>
 
           <Form.Item
-            label='Password'
+            label='Mật khẩu'
             name='password'
             rules={[
               {
                 required: true,
-                message: 'Please input your password!',
+                message: 'Nhập mật khâủ !',
               },
             ]}>
             <Input.Password />
           </Form.Item>
 
           <Form.Item {...tailLayout} name='remember' valuePropName='checked'>
-            <Checkbox>Remember me</Checkbox>
+            <Checkbox>Ghi nhớ</Checkbox>
           </Form.Item>
 
           <Form.Item {...tailLayout}>
             <Button type='primary' htmlType='submit'>
-              Submit
+              Đăng Nhập
             </Button>
           </Form.Item>
         </Form>
       </div>
   );
 };
-
-const mapStateToProps = (state) => ({
-  auth: state.auth,
-});
 
 export default LoginForm;

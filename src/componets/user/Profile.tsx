@@ -1,18 +1,26 @@
-import React from 'react';
-import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import {
   SettingOutlined,
-  PicLeftOutlined,
-  DownloadOutlined,
-  AliyunOutlined,
-  UserAddOutlined,
 } from '@ant-design/icons';
-import { Avatar, Menu } from 'antd';
+import { Avatar } from 'antd';
+import { useNavigate } from "react-router-dom";
 
 import './Profile.css';
+import localStorage from 'redux-persist/es/storage';
+import { KeyStogare } from '../../config/KeyStorage';
+import { useAppDispatch } from '../../stores/stores';
+import { resetAuth } from '../../stores/auth';
 
 const User = () => {
+  let navigate = useNavigate();
+
+  const dispatch = useAppDispatch();
+  const handleLogout = () => {
+    localStorage.removeItem(KeyStogare.Token);
+    navigate('/login', {replace: true});
+    dispatch(resetAuth());
+  };
+
   return (
     <div className='info-user-detail'>
       <div className='page-user'>
@@ -37,7 +45,7 @@ const User = () => {
             </h2>
           </div>
           <h3 className='full-name'>{''}</h3>
-          <div className='btn btn-status'>
+          <div className='btn btn-status' onClick={handleLogout}>
             <span>Đăng xuất</span>
           </div>
         </div>

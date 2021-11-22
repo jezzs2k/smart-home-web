@@ -1,0 +1,25 @@
+.body-home {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+}
+
+.detail-device {
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+    padding-top: 60px;
+}
+
+.icon {
+    font-size: x-large;
+}
+
+.body-home .home {
+    max-width: 80%;
+    width: 80%;
+};
+
+
