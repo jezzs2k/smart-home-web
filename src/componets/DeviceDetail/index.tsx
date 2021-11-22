@@ -7,14 +7,6 @@ import { Line } from 'react-chartjs-2';
 import './index.css';
 import useTimeout from '../../hooks/useTimeout';
 
-const data = [
-    'Racing car sprays burning fuel into crowd.',
-    'Japanese princess to wed commoner.',
-    'Australian walks 100km after outback crash.',
-    'Man charged over missing wedding girl.',
-    'Los Angeles battles huge wildfires.',
-];
-
 interface RenderItemT {
     title: string; value: string | number, unit?: string;
     index?: number;
@@ -107,7 +99,7 @@ const DeviceDetail = () => {
 
     useEffect(() => {
         if (dataEnergy) {
-            setTestW((((Number(dataEnergy.energytage) + 1) / WAT_DEFAULT) * 100));
+            setTestW((((Number(dataEnergy.energytage)) / WAT_DEFAULT) * 100));
         }
     }, [dataEnergy]);
 
@@ -328,7 +320,7 @@ const DeviceDetail = () => {
                 <Row>
                     <Col span={4}>
                         <h2>Công suất</h2>
-                        <Progress type="circle" percent={testW} width={180} format={percent => `${percent} W`} />
+                        <Progress type="circle" percent={testW} width={180} format={percent => `${Number(dataEnergy?.energytage || 0)} W`} />
                     </Col>
                     <Col span={20}>
                         <div className="list-w">

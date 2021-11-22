@@ -51,6 +51,16 @@ const Home = () => {
   const handleChooseItem = (item: DeviceT) => {
     if (item.id !== chooseItem?.id) {
       setChooseItem(item);
+      setListItem([
+        {
+          title: 'Thời gian sử dụng: ',
+          value: '0 Phút',
+        },
+        {
+          title: 'Lượng điện tiêu thụ: ',
+          value: '0 KWH',
+        },
+      ])
     }
   };
 
@@ -60,6 +70,10 @@ const Home = () => {
 
   const handleSetDataMinute = (data: any) => {
     let valueEnrgy: any = {};
+    if (!data?.energy) {
+      return;
+    };
+
     data.energy.split(",").forEach((item: string, index: number) => {
       if(index === 0) {
         valueEnrgy[item.split(":")[0].split("{")[1]] = item.split(":")[1];
@@ -104,8 +118,10 @@ const Home = () => {
       onDisconnect(starCountRef);
       onValue(starCountRef, (snapshot) => {
         const data = snapshot.val();
-        setDataFirebaseConnected(data);
-        handleSetDataMinute(data);
+        if (data) {
+          setDataFirebaseConnected(data);
+          handleSetDataMinute(data);
+        }
       });
     }
 
@@ -124,13 +140,14 @@ const Home = () => {
       const dataReceiver = data?.filter(item => item.isConnected);
       if (dataReceiver && dataReceiver?.length > 0) {
         if (dataDevices && dataDevices?.length > 0) {
-          setDataDevices((values: DeviceT[]) => values?.map((item: DeviceT) => {
+          const values = dataDevices?.map((item: DeviceT) => {
             if (item.deviceId === chooseItem?.deviceId) {
               return {...item, isTurnOn:  dataFirebaseConnected.isTurnOn === 'true' ? true : false}
             }
   
             return item;
-          }))
+          })
+          setDataDevices(values);
         }
       }
     }

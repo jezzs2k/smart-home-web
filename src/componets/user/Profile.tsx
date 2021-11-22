@@ -8,11 +8,13 @@ import { useNavigate } from "react-router-dom";
 import './Profile.css';
 import localStorage from 'redux-persist/es/storage';
 import { KeyStogare } from '../../config/KeyStorage';
-import { useAppDispatch } from '../../stores/stores';
+import { RootState, useAppDispatch } from '../../stores/stores';
 import { resetAuth } from '../../stores/auth';
+import { useSelector } from 'react-redux';
 
 const User = () => {
   let navigate = useNavigate();
+  const {user} = useSelector((state: RootState) => state.auth)
 
   const dispatch = useAppDispatch();
   const handleLogout = () => {
@@ -20,6 +22,10 @@ const User = () => {
     navigate('/login', {replace: true});
     dispatch(resetAuth());
   };
+
+  console.log(user);
+  
+  
 
   return (
     <div className='info-user-detail'>
@@ -29,7 +35,7 @@ const User = () => {
         </div>
         <div className='info-user'>
           <div className='top-profile'>
-            <h2 className='name-user'>{'Vu Thanh Hieu'}</h2>
+            <h2 className='name-user'>{user?.username || ''}</h2>
             <Link to='/system' className='edit-profile'>
               <div className='btn btn-edit'>
                 <span>Chỉnh sửa trang cá nhân</span>
@@ -38,10 +44,10 @@ const User = () => {
             </Link>
           </div>
           <div className='info-detail'>
-            <h2 className='article-total'>Email: Vuhieu@gmail.com</h2>
-            <h2 className='follow'>Tên: Vũ Thanh Hiếu</h2>
+            <h2 className='article-total'>Email: {user?.email || ''}</h2>
+            <h2 className='follow'>Tên: {user?.username || ''}</h2>
             <h2 className='request-follow'>
-              Thiết bị đã kết nối {0}
+              Thiết bị đã kết nối {user?.devicesEsp.length || 0}
             </h2>
           </div>
           <h3 className='full-name'>{''}</h3>
