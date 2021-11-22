@@ -25,7 +25,7 @@ const tailLayout = {
 const LoginForm = ({  }) => {
   const {token} = useSelector((state: RootState) => state.auth);
   const dispatch = useAppDispatch();
-  let navigate = useNavigate();
+  const navigate = useNavigate();
 
   const onFinish = (values: {username: string, password: string}) => {
     dispatch(login(values));

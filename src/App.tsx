@@ -1,21 +1,3 @@
-// import { useState } from 'react'
-// import logo from './logo.svg'
-// import './App.css'
-// import React, { useEffect } from 'react';
-// import { Provider } from 'react-redux';
-
-// import './App.css';
-
-// import Layout from './componets/layout/layout';
-
-// function App() {
-//   return <div className='App'>
-//         <Layout />
-//       </div>
-// }
-
-// export default App
-
 import * as React from "react";
 import {
   Routes,
@@ -34,6 +16,7 @@ import UserDetail from './componets/user/UserDetail';
 import { useSelector } from "react-redux";
 import { RootState } from "./stores/stores";
 import Home from "./componets/home";
+import DeviceDetail from './componets/DeviceDetail';
 
 export default function App() {
   const {token} = useSelector((state: RootState) => state.auth);
@@ -47,6 +30,7 @@ export default function App() {
         <Route path="/" element={token ? <Home /> :<StartPage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/user" element={<UserDetail />} />
+        <Route path="/device-detail/:deviceId" element={<DeviceDetail />} />
       </Routes>
     </div>
   );

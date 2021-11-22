@@ -1,20 +1,33 @@
 import { useEffect, useState } from "react";
 import { List, Avatar, Row, Col, Card, Button, Skeleton, Empty } from "antd";
 import { AlertOutlined } from "@ant-design/icons";
+import {useNavigate} from 'react-router-dom';
 import { DeviceT, getDevices } from "../../stores/factories/device";
 
 
 import "./index.css";
 import { RootState, useAppDispatch } from "../../stores/stores";
 import { useSelector } from "react-redux";
-import { getDatabase, ref, onValue, get, child} from "firebase/database";
-import { getApp } from "firebase/app";
+import { getDatabase, ref, onValue, off, onDisconnect, set} from "firebase/database";
 
 const Home = () => {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const [chooseItem, setChooseItem] = useState<DeviceT|null>(null);
+  const [dataFirebaseConnected, setDataFirebaseConnected] = useState<any>(null);
   const { loading, data } = useSelector((state: RootState) => state.device);
   const { token: tokenAcc } = useSelector((state: RootState) => state.auth);
+  const [dataDevices, setDataDevices] = useState<DeviceT[] | null>(null);
+  const [listItem, setListItem] = useState([
+    {
+      title: 'Thời gian sử dụng: ',
+      value: '0 Phút',
+    },
+    {
+      title: 'Lượng điện tiêu thụ: ',
+      value: '0 KWH',
+    },
+  ]);
   
 
   const handleCheckData = (data?: DeviceT[] | null) => {
@@ -25,9 +38,51 @@ const Home = () => {
     return data.findIndex((item) => item.isConnected === true) !== -1;
   };
 
-  const handleTurnOnOff = () => {};
+  const handleTurnOnOff = () => {
+    if (chooseItem) {
+      const db = getDatabase();
+      const starCountRef = ref(db, '/' + chooseItem.deviceId + '/isTurnOn');
 
-  const handleToDetailDevice = () => {};
+      set(starCountRef,  dataFirebaseConnected.isTurnOn === 'true' ? 'false' : 'true');
+    }
+   
+  };
+
+  const handleChooseItem = (item: DeviceT) => {
+    if (item.id !== chooseItem?.id) {
+      setChooseItem(item);
+    }
+  };
+
+  const handleToDetailDevice = () => {
+    navigate('/device-detail/' + chooseItem?.deviceId, {replace: false})
+  };
+
+  const handleSetDataMinute = (data: any) => {
+    let valueEnrgy: any = {};
+    data.energy.split(",").forEach((item: string, index: number) => {
+      if(index === 0) {
+        valueEnrgy[item.split(":")[0].split("{")[1]] = item.split(":")[1];
+      }
+      
+      if(item !== "}"){
+        valueEnrgy[item.split(":")[0]] = item.split(":")[1]
+        }
+    });
+
+    const temps = listItem.map((item, index) => {
+      if (index === 0) {
+        if (data.isTurnOn === 'true') {
+          return {...item, value: String(Math.floor((data.totalTimeOn + new Date().getTime() - data.startTime)/(1000*60))) + ' Phút'}
+        };
+        return {...item, value: String(Math.floor((data.totalTimeOn)/(1000*60))) + ' Phút'}
+      }else {
+        return {...item, value: String(valueEnrgy.energytage)+ ' KWH'};
+      }
+    });
+
+    setListItem(temps);
+  }
 
   useEffect(() => {
     dispatch(getDevices());
@@ -36,36 +91,52 @@ const Home = () => {
   useEffect(() => {
     const dataReceiver = data?.filter(item => item.isConnected);
     if (dataReceiver && dataReceiver?.length > 0) {
-      setChooseItem(dataReceiver[0])
+      setDataDevices(dataReceiver);
+      (dataReceiver[0].id !== chooseItem?.id) &&  setChooseItem(dataReceiver[0])
     }
   }, [data])
 
   useEffect(() => {
     if (chooseItem && chooseItem.deviceId) {
-      const dbRef = ref(getDatabase(getApp()));
-      get(child(dbRef, `/${chooseItem.deviceId}/isActive`)).then((snapshot) => {
-        if (snapshot.exists()) {
-          console.log(snapshot.val());
-        } else {
-          console.log("No data available");
-        }
-      }).catch((error) => {
-        console.error(error);
-      });
-      
-      // database.ref('/' + chooseItem.deviceId, (snap) => {
-      //   const realTimeData = snap.val();
-      // })
       const db = getDatabase();
       const starCountRef = ref(db, '/' + chooseItem.deviceId);
+      
+      onDisconnect(starCountRef);
       onValue(starCountRef, (snapshot) => {
         const data = snapshot.val();
-        console.log(data);
+        setDataFirebaseConnected(data);
+        handleSetDataMinute(data);
       });
     }
+
+    return () => {
+      if (chooseItem && chooseItem.deviceId) {
+        const db = getDatabase();
+        const starCountRef = ref(db, '/' + chooseItem.deviceId);
+
+        off(starCountRef, 'value')
+      }
+    };
   }, [chooseItem])
 
-  if (!data && loading) {
+  useEffect(() => {
+    if (dataFirebaseConnected) {
+      const dataReceiver = data?.filter(item => item.isConnected);
+      if (dataReceiver && dataReceiver?.length > 0) {
+        if (dataDevices && dataDevices?.length > 0) {
+          setDataDevices((values: DeviceT[]) => values?.map((item: DeviceT) => {
+            if (item.deviceId === chooseItem?.deviceId) {
+              return {...item, isTurnOn:  dataFirebaseConnected.isTurnOn === 'true' ? true : false}
+            }
+  
+            return item;
+          }))
+        }
+      }
+    }
+  }, [dataFirebaseConnected])
+
+  if (!dataDevices && loading) {
     return (
       <div className="body-home">
         <div className="home">
@@ -75,7 +146,7 @@ const Home = () => {
     );
   }
 
-  if (!data && !loading && !handleCheckData(data)) {
+  if (!dataDevices && !loading && !handleCheckData(data)) {
     return (
       <div className="body-home">
         <div className="home">
@@ -85,21 +156,33 @@ const Home = () => {
     );
   }
 
+  if (!dataDevices) {
+    return (
+      <div className="body-home">
+        <div className="home">
+          <Empty />
+        </div>
+      </div>
+    );
+  }
+
+
   return (
     <div className="body-home">
       <div className="home">
         <Row>
           <Col span={12}>
             <div className="list-device">
-              <h2>Cac thiet bi da ket noi</h2>
+              <h2>Các thiết bị đã kết nối</h2>
               <List
                 itemLayout="horizontal"
-                dataSource={data?.filter(item => item.isConnected)}
+                dataSource={dataDevices as DeviceT[]}
                 renderItem={(item) => (
                   <List.Item
                     actions={[
+                      <Button type='link' onClick={() => handleChooseItem(item)}>Theo dõi thiết bị</Button>,
                       <div>
-                        <AlertOutlined className={'icon'} style={item.isConnected ? {color: '#ffc147'} : {}} />
+                        <AlertOutlined className={'icon'} style={item.isTurnOn ? {color: '#ffc147'} : {}} />
                       </div>,
                     ]}
                   >
@@ -108,7 +191,7 @@ const Home = () => {
                         <Avatar src="https://image.flaticon.com/icons/png/512/1255/1255694.png" />
                       }
                       title={item.deviceName}
-                      description={'Thiet bi dang ' + (item.isConnected ? 'bat' : 'tat')}
+                      description={'Thiết bị đang ' + (item?.isTurnOn ? 'bật' : 'tắt')}
                     />
                   </List.Item>
                 )}
@@ -117,18 +200,18 @@ const Home = () => {
           </Col>
           <Col span={12}>
             <div className="detail-device">
-              {chooseItem ? <Card
+              {dataFirebaseConnected && chooseItem ? <Card
                 title={chooseItem.deviceName}
                 extra={
                   <Button type="primary" shape="circle" onClick={handleTurnOnOff}>
-                    Bat
+                    {dataFirebaseConnected?.isTurnOn === 'false' ? 'Bật' : 'Tắt'}
                   </Button>
                 }
                 style={{ width: 300 }}
               >
-                <p>Thoi gian su dung: 45 phut</p>
-                <p>Cong suat tieu thu: 35 KWH</p>
-                <Button onClick={handleToDetailDevice}>Xem chi tiet</Button>
+                <p>Thời gian sữ dụng: {listItem[0].value}</p>
+                <p>Công suất tiêu thụ: {listItem[1].value}</p>
+                <Button onClick={handleToDetailDevice}>Xem chi tiết</Button>
               </Card>: <Skeleton />}
             </div>
           </Col>
