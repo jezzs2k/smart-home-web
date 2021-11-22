@@ -99,7 +99,7 @@ const DeviceDetail = () => {
 
     useEffect(() => {
         if (dataEnergy) {
-            setTestW((((Number(dataEnergy.energytage)) / WAT_DEFAULT) * 100));
+            setTestW((((Number(dataEnergy.power)) / WAT_DEFAULT) * 100));
         }
     }, [dataEnergy]);
 
@@ -120,7 +120,7 @@ const DeviceDetail = () => {
 
             onValue(starCountRef, (snapshot) => {
                 const data = snapshot.val();
-                if (data.isTurnOn === 'true') {
+                // if (data.isTurnOn === 'true') {
                     if (data.energy) {
                         let valueEnrgy: any = {};
                         data.energy.split(",").forEach((item: string, index: number) => {
@@ -148,7 +148,7 @@ const DeviceDetail = () => {
                             }
                         });
 
-                        setm15E(valueEnrgy.energytage);
+                        setm15E(valueEnrgy.power);
                         m15 = data.m15;
                     }
 
@@ -165,7 +165,7 @@ const DeviceDetail = () => {
                             }
                         });
 
-                        seth1E(valueEnrgy.energytage);
+                        seth1E(valueEnrgy.power);
                     }
 
                     if (data.h6 && h6 !== data.h6) {
@@ -181,7 +181,7 @@ const DeviceDetail = () => {
                             }
                         });
 
-                        seth6E(valueEnrgy.energytage);
+                        seth6E(valueEnrgy.power);
                     }
 
 
@@ -198,7 +198,7 @@ const DeviceDetail = () => {
                             }
                         });
 
-                        seth12E(valueEnrgy.energytage);
+                        seth12E(valueEnrgy.power);
                     }
 
                     if (data.h24 && h24 !== data.h24) {
@@ -214,7 +214,7 @@ const DeviceDetail = () => {
                             }
                         });
 
-                        seth24E(valueEnrgy.energytage);
+                        seth24E(valueEnrgy.power);
                     }
 
                     if (data.w1 && w1 !== data.w1) {
@@ -230,7 +230,7 @@ const DeviceDetail = () => {
                             }
                         });
 
-                        setw1E(valueEnrgy.energytage);
+                        setw1E(valueEnrgy.power);
                     }
 
                     if (data.M1 && M1 !== data.M1) {
@@ -246,9 +246,9 @@ const DeviceDetail = () => {
                             }
                         });
 
-                        setM1E(valueEnrgy.energytage);
+                        setM1E(valueEnrgy.power);
                     }
-                }
+                // }
             });
         }
     }, 100);
@@ -320,7 +320,7 @@ const DeviceDetail = () => {
                 <Row>
                     <Col span={4}>
                         <h2>Công suất</h2>
-                        <Progress type="circle" percent={testW} width={180} format={percent => `${Number(dataEnergy?.energytage || 0)} W`} />
+                        <Progress type="circle" percent={testW} width={180} format={percent => `${Number(dataEnergy?.power || 0)} W`} />
                     </Col>
                     <Col span={20}>
                         <div className="list-w">

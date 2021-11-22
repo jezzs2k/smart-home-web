@@ -91,7 +91,7 @@ const Home = () => {
         };
         return {...item, value: String(Math.floor((data.totalTimeOn)/(1000*60))) + ' Phút'}
       }else {
-        return {...item, value: String(valueEnrgy.energytage)+ ' KWH'};
+        return {...item, value: String(valueEnrgy.power || 0)+ ' KWH'};
       }
     });
 
