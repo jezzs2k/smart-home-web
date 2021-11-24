@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom'
 import 'antd/dist/antd.css';
 import {BrowserRouter} from "react-router-dom";
 import { Provider } from 'react-redux';
+import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
 import './config/firebase';
 
 import store from '../src/stores/stores';

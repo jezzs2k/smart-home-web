@@ -1,19 +1,25 @@
 import { useEffect, useState } from "react";
-import { List, Avatar, Row, Col, Card, Button, Skeleton, Empty } from "antd";
-import { AlertOutlined } from "@ant-design/icons";
+import { List, Avatar, Row, Col, Card, Button, Skeleton, Empty, Progress, Spin } from "antd";
+import { AlertOutlined, LoadingOutlined } from "@ant-design/icons";
 import {useNavigate} from 'react-router-dom';
 import { DeviceT, getDevices } from "../../stores/factories/device";
-
+import { Button as ButtonBT } from 'react-bootstrap';
 
 import "./index.css";
 import { RootState, useAppDispatch } from "../../stores/stores";
 import { useSelector } from "react-redux";
 import { getDatabase, ref, onValue, off, onDisconnect, set} from "firebase/database";
+import { KeyStogare } from "../../config/KeyStorage";
+import { Colors } from "../../config";
+
+const antIcon = <LoadingOutlined style={{ fontSize: 60 }} spin />;
 
 const Home = () => {
+  const getItem = localStorage.getItem(KeyStogare.CHOOSE_ITEM);
+  const choosedItem = getItem ? JSON.parse(getItem) : null;
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const [chooseItem, setChooseItem] = useState<DeviceT|null>(null);
+  const [chooseItem, setChooseItem] = useState<DeviceT|null>(choosedItem);
   const [dataFirebaseConnected, setDataFirebaseConnected] = useState<any>(null);
   const { loading, data } = useSelector((state: RootState) => state.device);
   const { token: tokenAcc } = useSelector((state: RootState) => state.auth);
@@ -50,6 +56,7 @@ const Home = () => {
 
   const handleChooseItem = (item: DeviceT) => {
     if (item.id !== chooseItem?.id) {
+      localStorage.setItem(KeyStogare.CHOOSE_ITEM, JSON.stringify(item));
       setChooseItem(item);
       setListItem([
         {
@@ -106,7 +113,8 @@ const Home = () => {
     const dataReceiver = data?.filter(item => item.isConnected);
     if (dataReceiver && dataReceiver?.length > 0) {
       setDataDevices(dataReceiver);
-      (dataReceiver[0].id !== chooseItem?.id) &&  setChooseItem(dataReceiver[0])
+      localStorage.setItem(KeyStogare.CHOOSE_ITEM, JSON.stringify(dataReceiver[0]));
+      !localStorage.getItem(KeyStogare.CHOOSE_ITEM) && (dataReceiver[0].id !== chooseItem?.id) &&  setChooseItem(dataReceiver[0])
     }
   }, [data])
 
@@ -188,18 +196,19 @@ const Home = () => {
     <div className="body-home">
       <div className="home">
         <Row>
-          <Col span={12}>
+          <Col xl={12} lg={{ order: 1,  span: 12 }} md={15}>
             <div className="list-device">
-              <h2>Các thiết bị đã kết nối</h2>
+              <h3 style={{paddingTop: 30, marginBottom: 30}}>Các thiết bị đã kết nối</h3>
               <List
                 itemLayout="horizontal"
                 dataSource={dataDevices as DeviceT[]}
                 renderItem={(item) => (
                   <List.Item
+                    style={{borderRadius: '8px', borderBottom: '0px', backgroundColor: Colors.BG, marginTop: '6px', marginBottom: '6px', ...(item.isTurnOn ? {backgroundColor: 'rgb(255 210 63)'} : {})}}
                     actions={[
                       <Button type='link' onClick={() => handleChooseItem(item)}>Theo dõi thiết bị</Button>,
                       <div>
-                        <AlertOutlined className={'icon'} style={item.isTurnOn ? {color: '#ffc147'} : {}} />
+                        <AlertOutlined className={'icon'} style={item.isTurnOn ? {color: Colors.WHITE} : {}} />
                       </div>,
                     ]}
                   >
@@ -215,16 +224,15 @@ const Home = () => {
               />
             </div>
           </Col>
-          <Col span={12}>
+          <Col xl={12} lg={{ order: 1, span: 10 }} md={9}>
             <div className="detail-device">
               {dataFirebaseConnected && chooseItem ? <Card
                 title={chooseItem.deviceName}
                 extra={
-                  <Button type="primary" shape="circle" onClick={handleTurnOnOff}>
-                    {dataFirebaseConnected?.isTurnOn === 'false' ? 'Bật' : 'Tắt'}
-                  </Button>
+                  dataFirebaseConnected?.isTurnOn === 'false'? <ButtonBT onClick={handleTurnOnOff} variant="success">Bật</ButtonBT> :
+                  <ButtonBT onClick={handleTurnOnOff} variant="danger">Tắt</ButtonBT>
                 }
-                style={{ width: 300 }}
+                style={{ width: 300,borderRadius: '8px', padding: 16 }}
               >
                 <p>Thời gian sữ dụng: {listItem[0].value}</p>
                 <p>Công suất tiêu thụ: {listItem[1].value}</p>

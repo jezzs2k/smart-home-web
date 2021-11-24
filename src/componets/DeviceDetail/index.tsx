@@ -52,15 +52,18 @@ const DeviceDetail = () => {
     voltage: string;
   } | null>(null);
 
-  const [dataEnergies, setDataEnergies] = useState<{
-    current: string;
-    electricityBill: string;
-    energytage: string;
-    frequency: string;
-    pf: string;
-    power: string;
-    voltage: string;
-  }[] | null>(null);
+  const [dataEnergies, setDataEnergies] = useState<
+    | {
+        current: string;
+        electricityBill: string;
+        energytage: string;
+        frequency: string;
+        pf: string;
+        power: string;
+        voltage: string;
+      }[]
+    | null
+  >(null);
   const [testW, setTestW] = useState(0);
   const [dataWatt, setDataWatt] = useState([0, 0, 0, 0, 0, 0, 0]);
   const ListItemMeasure: RenderItemT[] = [
@@ -135,7 +138,7 @@ const DeviceDetail = () => {
           });
 
           setDataEnergy(valueEnrgy);
-          setDataEnergies((data) => ([...(data ? (data) : []), valueEnrgy]))
+          setDataEnergies((data) => [...(data ? data : []), valueEnrgy]);
         }
 
         if (data.m15 && m15 !== data.m15) {
@@ -253,7 +256,7 @@ const DeviceDetail = () => {
       });
     }
   }, 100);
-  
+
   useEffect(() => {
     return () => {
       if (params.deviceId) {
@@ -318,8 +321,20 @@ const DeviceDetail = () => {
     <div className="body-home">
       <div className="device-detail">
         <Row>
-          <Col span={4}>
-            <h2>Công suất</h2>
+          <Col
+            xs={{ order: 1 }}
+            sm={12}
+            md={10}
+            lg={8}
+            xl={5}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexDirection: "column",
+            }}
+          >
+            <h2 style={{ textAlign: "center" }}>Công suất</h2>
             <Progress
               type="circle"
               percent={testW}
@@ -327,7 +342,7 @@ const DeviceDetail = () => {
               format={(percent) => `${Number(dataEnergy?.power || 0)} W`}
             />
           </Col>
-          <Col span={20}>
+          <Col xs={{ order: 2 }} sm={12} md={14} lg={16} xl={19}>
             <div className="list-w">
               <List
                 bordered
@@ -342,16 +357,16 @@ const DeviceDetail = () => {
           </Col>
         </Row>
         <Row>
-          <Col span={12}>
+          <Col lg={12} xs={{ order: 1 }}>
             <div className="chart">
               <div className="chart-dev">
                 <Line
                   data={{
-                    labels: dataEnergies?.map(item => '') || [],
+                    labels: dataEnergies?.map((item) => "") || [],
                     datasets: [
                       {
-                        label: "Công suất (KWH)",
-                        data: dataEnergies?.map(item => item.power) || [],
+                        label: "Công suất (W)",
+                        data: dataEnergies?.map((item) => item.power) || [],
                         fill: true,
                         backgroundColor: "#ff638466",
                         borderColor: "rgba(255, 99, 132, 0.2)",
@@ -373,7 +388,7 @@ const DeviceDetail = () => {
               </div>
             </div>
           </Col>
-          <Col span={12}>
+          <Col lg={12} xs={{ order: 1 }}>
             <div className="chart">
               <div className="chart-dev">
                 <Line
