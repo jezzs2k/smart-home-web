@@ -44,6 +44,16 @@
   border-radius: 2px;
 }
 
+.page-user .top-profile .btn-edit span {
+  padding: 14px;
+}
+
+.page-user .top-profile a {
+  text-decoration: unset;
+  padding: 14px,
+}
+
+
 .page-user .top-profile .edit-profile .icon-edit {
   display: flex;
   align-items: center;
@@ -68,6 +78,7 @@
 
 .page-user .info-user .info-detail {
   display: flex;
+  flex-direction: column;
 }
 
 .page-user .info-user .article-total,
@@ -75,12 +86,12 @@
 .page-user .info-user .request-follow {
   color: #4e4e4e;
   font-size: 1rem;
-  margin: 0;
+  margin: 8px 0px;
 }
 
 .page-user .info-user .follow,
 .page-user .info-user .request-follow {
-  margin: 0 15px;
+  margin: 8px 0px;
 }
 
 .page-user .info-user .full-name {

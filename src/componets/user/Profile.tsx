@@ -37,7 +37,7 @@ const User = () => {
           <div className='top-profile'>
             <h2 className='name-user'>{user?.username || ''}</h2>
             <Link to='/system' className='edit-profile'>
-              <div className='btn btn-edit'>
+              <div className='btn-edit'>
                 <span>Chỉnh sửa trang cá nhân</span>
               </div>
               <SettingOutlined className='icon-edit' />

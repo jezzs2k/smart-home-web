@@ -9,9 +9,12 @@ import {
   UserOutlined,
   DownloadOutlined,
   SettingOutlined,
+  HeartOutlined,
+  PlusCircleOutlined,
 } from '@ant-design/icons';
 
 import './Navbar.css';
+import AddDevice from '../AddDevices';
 
 const { Search } = Input;
 
@@ -67,39 +70,28 @@ const Navbar = ({ }) => {
         </li>
         <li className='ant-menu-submenu ant-menu-submenu-horizontal ant-menu-overflowed-submenu '>
           <div className='ant-menu-submenu-title nav-child'>
-            <Link to='/message'>
-              {/* <SendOutlined className='icon' /> */}
-            </Link>
-          </div>
-        </li>
-        <li className='ant-menu-submenu ant-menu-submenu-horizontal ant-menu-overflowed-submenu '>
-          <div className='ant-menu-submenu-title nav-child'>
             <Link to='/user'>
               <UserOutlined className='icon' />
               {/* <InstagramOutlined className='icon' /> */}
             </Link>
           </div>
         </li>
-        {/* <li className='ant-menu-submenu ant-menu-submenu-horizontal ant-menu-overflowed-submenu '>
+        <li className='ant-menu-submenu ant-menu-submenu-horizontal ant-menu-overflowed-submenu '>
           <div className='ant-menu-submenu-title nav-child'>
             <Popover
               placement='bottomRight'
-              content={<Notification />}
+              content={<AddDevice />}
               trigger='click'>
-              <HeartOutlined className='icon' />
+              <PlusCircleOutlined className='icon' />
             </Popover>
           </div>
-        </li> */}
+        </li>
         <li className='ant-menu-submenu ant-menu-submenu-horizontal ant-menu-overflowed-submenu '>
           <div className='ant-menu-submenu-title nav-child'>
             <Popover
               placement='bottomRight'
               content={systemModal}
               trigger='click'>
-              {/* <Avatar
-                className='avatar-jezzs'
-                src={infoUser && infoUser.avatar}
-              /> */}
             </Popover>
           </div>
         </li>

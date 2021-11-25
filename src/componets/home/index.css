@@ -22,4 +22,11 @@
     width: 80%;
 }
 
+.header-left{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
 
