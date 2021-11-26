@@ -14,7 +14,11 @@ import {
 } from "antd";
 import { AlertOutlined, LoadingOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
-import { deleteDevice, DeviceT, getDevices } from "../../stores/factories/device";
+import {
+  deleteDevice,
+  DeviceT,
+  getDevices,
+} from "../../stores/factories/device";
 import { Button as ButtonBT } from "react-bootstrap";
 
 import "./index.css";
@@ -31,15 +35,24 @@ import {
 import { KeyStogare } from "../../config/KeyStorage";
 import { Colors } from "../../config";
 import { resetDeleteDevice } from "../../stores/device";
+import useDebounce from "../../hooks/useDebounce";
 
 const { Search } = Input;
 
-const openNotification = ({title, content}: {title: string, content: string}) => {
+let cacheDataDevices: DeviceT[] = [];
+
+const openNotification = ({
+  title,
+  content,
+}: {
+  title: string;
+  content: string;
+}) => {
   notification.open({
     message: title,
     description: content,
     onClick: () => {
-      console.log('Notification Clicked!');
+      console.log("Notification Clicked!");
     },
   });
 };
@@ -51,7 +64,9 @@ const Home = () => {
   const navigate = useNavigate();
   const [chooseItem, setChooseItem] = useState<DeviceT | null>(choosedItem);
   const [dataFirebaseConnected, setDataFirebaseConnected] = useState<any>(null);
-  const { loading, data, deleteSuccess } = useSelector((state: RootState) => state.device);
+  const { loading, data, deleteSuccess } = useSelector(
+    (state: RootState) => state.device
+  );
   const { token: tokenAcc } = useSelector((state: RootState) => state.auth);
   const [dataDevices, setDataDevices] = useState<DeviceT[] | null>(null);
   const [itemDelete, setItemDelete] = useState<DeviceT | null>(null);
@@ -68,16 +83,22 @@ const Home = () => {
   const [visible, setVisible] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [modalText, setModalText] = useState("");
+  const [text, setText] = useState("");
 
   const showModal = (item: DeviceT) => {
     setItemDelete(item);
-    setModalText("Bạn có chắn chắn muốn xóa " + item.deviceName + " " + "ra khỏi tài khoản của bạn!")
+    setModalText(
+      "Bạn có chắn chắn muốn xóa " +
+        item.deviceName +
+        " " +
+        "ra khỏi tài khoản của bạn!"
+    );
     setVisible(true);
   };
 
   const handleOk = () => {
     if (itemDelete) {
-      setModalText('Thiết bị sẽ được xóa trong 2s');
+      setModalText("Thiết bị sẽ được xóa trong 2s");
       setConfirmLoading(true);
       localStorage.removeItem(KeyStogare.CHOOSE_ITEM);
       setTimeout(() => {
@@ -87,7 +108,6 @@ const Home = () => {
         dispatch(getDevices());
       }, 2000);
     }
-   
   };
 
   const handleCancel = () => {
@@ -177,12 +197,34 @@ const Home = () => {
     setListItem(temps);
   };
 
+  const handleSearch = (value: string) => {
+    if (value && dataDevices) {
+      const newDataDevice = cacheDataDevices?.filter((item) =>
+        item.deviceName.toLocaleUpperCase().includes(value.toLocaleUpperCase())
+      );
+      setDataDevices(newDataDevice);
+    } else {
+      cacheDataDevices.length > 0 && setDataDevices(cacheDataDevices);
+    }
+  };
+
+  useDebounce(
+    () => {
+      handleSearch(text);
+    },
+    200,
+    [text]
+  );
+
   useEffect(() => {
     if (deleteSuccess) {
-      openNotification({title: "Đã xóa thiết bị", content: "Thiết bị đã bị xóa, bạn có thể keert nối lại bằng điện thoại"});
+      openNotification({
+        title: "Đã xóa thiết bị",
+        content: "Thiết bị đã bị xóa, bạn có thể kết nối lại bằng điện thoại",
+      });
       dispatch(resetDeleteDevice());
     }
-  }, [deleteSuccess])
+  }, [deleteSuccess]);
 
   useEffect(() => {
     dispatch(getDevices());
@@ -192,17 +234,17 @@ const Home = () => {
     const dataReceiver = data?.filter((item) => item.isConnected);
     if (dataReceiver && dataReceiver?.length > 0) {
       setDataDevices(dataReceiver);
+      cacheDataDevices = dataReceiver;
       localStorage.setItem(
         KeyStogare.CHOOSE_ITEM,
         JSON.stringify(dataReceiver[0])
       );
-        
+
       if (itemDelete) {
-        dataReceiver[0].id !== chooseItem?.id &&
-        setChooseItem(dataReceiver[0]);
+        dataReceiver[0].id !== chooseItem?.id && setChooseItem(dataReceiver[0]);
         setItemDelete(null);
       }
-      
+
       !localStorage.getItem(KeyStogare.CHOOSE_ITEM) &&
         dataReceiver[0].id !== chooseItem?.id &&
         setChooseItem(dataReceiver[0]);
@@ -288,7 +330,7 @@ const Home = () => {
 
   return (
     <div className="body-home">
-       <Modal
+      <Modal
         title="Xóa thiết bị khỏi tài khoản"
         visible={visible}
         onOk={handleOk}
@@ -308,63 +350,70 @@ const Home = () => {
                 <Search
                   className="search-form"
                   placeholder="Tìm kiếm"
-                  onSearch={(value) => console.log(value)}
+                  onSearch={(value) => setText(value)}
                   style={{ width: 200 }}
+                  onChange={(value) => {
+                    setText(value.target.value);
+                  }}
                 />
               </div>
-              <List
-                itemLayout="horizontal"
-                dataSource={dataDevices as DeviceT[]}
-                renderItem={(item) => (
-                  <List.Item
-                    style={{
-                      borderRadius: "8px",
-                      borderBottom: "0px",
-                      backgroundColor: Colors.BG,
-                      marginTop: "6px",
-                      marginBottom: "6px",
-                      ...(item.isTurnOn
-                        ? { backgroundColor: "rgb(255 210 63)" }
-                        : {}),
-                    }}
-                    actions={[
-                      <div style={{flexDirection: 'column', display: 'flex'}}>
-                        <Button
-                        type="link"
-                        onClick={() => handleChooseItem(item)}
-                      >
-                        Theo dõi thiết bị
-                      </Button>
-                      <Button
-                        type="link"
-                        style={{color: 'red'}}
-                        onClick={() => showModal(item)}
-                        disabled={item.isTurnOn}
-                      >
-                        Xóa
-                      </Button>
-                      </div>,
-                      <div>
-                        <AlertOutlined
-                          className={"icon"}
-                          style={item.isTurnOn ? { color: Colors.WHITE } : {}}
-                        />
-                      </div>,
-                    ]}
-                  >
-                    <List.Item.Meta
-                      avatar={
-                        <Avatar src="https://image.flaticon.com/icons/png/512/1255/1255694.png" />
-                      }
-                      title={item.deviceName}
-                      description={
-                        "Thiết bị đang " + (item?.isTurnOn ? "bật" : "tắt")
-                      }
-                      style={{padding: "0 8px"}}
-                    />
-                  </List.Item>
-                )}
-              />
+              <div className={'list-item-h'} style={{height: 580,  overflow: 'auto',}}>
+                <List
+                  itemLayout="horizontal"
+                  dataSource={dataDevices as DeviceT[]}
+                  renderItem={(item) => (
+                    <List.Item
+                      style={{
+                        borderRadius: "8px",
+                        borderBottom: "0px",
+                        backgroundColor: Colors.BG,
+                        marginTop: "6px",
+                        marginBottom: "6px",
+                        ...(item.isTurnOn
+                          ? { backgroundColor: "rgb(255 210 63)" }
+                          : {}),
+                      }}
+                      actions={[
+                        <div
+                          style={{ flexDirection: "column", display: "flex" }}
+                        >
+                          <Button
+                            type="link"
+                            onClick={() => handleChooseItem(item)}
+                          >
+                            Theo dõi thiết bị
+                          </Button>
+                          <Button
+                            type="link"
+                            style={{ color: "red" }}
+                            onClick={() => showModal(item)}
+                            disabled={item.isTurnOn}
+                          >
+                            Xóa
+                          </Button>
+                        </div>,
+                        <div>
+                          <AlertOutlined
+                            className={"icon"}
+                            style={item.isTurnOn ? { color: Colors.WHITE } : {}}
+                          />
+                        </div>,
+                      ]}
+                    >
+                      <List.Item.Meta
+                        avatar={
+                          <Avatar src="https://image.flaticon.com/icons/png/512/1255/1255694.png" />
+                        }
+                        title={item.deviceName}
+                        description={
+                          "Thiết bị đang " + (item?.isTurnOn ? "bật" : "tắt")
+                        }
+                        style={{ padding: "0 8px" }}
+                      />
+                    </List.Item>
+                  )}
+                />
+              </div>
             </div>
           </Col>
           <Col xl={12} lg={{ order: 1, span: 10 }} md={9}>

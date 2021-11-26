@@ -1,32 +1,42 @@
 .body-home {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    height: 100%;
-    justify-content: center;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  justify-content: center;
 }
 
 .detail-device {
-    display: flex;
-    align-items: flex-end;
-    justify-content: flex-end;
-    padding-top: 92px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  padding-top: 92px;
 }
 
 .icon {
-    font-size: x-large;
+  font-size: x-large;
 }
 
 .body-home .home {
-    max-width: 80%;
-    width: 80%;
+  max-width: 80%;
+  width: 80%;
 }
 
-.header-left{
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
+.header-left {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
 }
 
+.list-item-h::-webkit-scrollbar {
+  width: 0.25em;
+}
 
+.list-item-h::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 1px rgba(185, 30, 30, 0.3);
+}
+
+.list-item-h::-webkit-scrollbar-thumb {
+  background-color: rgb(194, 194, 194);
+}
