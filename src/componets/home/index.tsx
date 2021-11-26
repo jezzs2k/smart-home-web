@@ -8,13 +8,13 @@ import {
   Button,
   Skeleton,
   Empty,
-  Progress,
-  Spin,
+  Modal,
   Input,
+  notification,
 } from "antd";
 import { AlertOutlined, LoadingOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
-import { DeviceT, getDevices } from "../../stores/factories/device";
+import { deleteDevice, DeviceT, getDevices } from "../../stores/factories/device";
 import { Button as ButtonBT } from "react-bootstrap";
 
 import "./index.css";
@@ -30,8 +30,19 @@ import {
 } from "firebase/database";
 import { KeyStogare } from "../../config/KeyStorage";
 import { Colors } from "../../config";
+import { resetDeleteDevice } from "../../stores/device";
 
 const { Search } = Input;
+
+const openNotification = ({title, content}: {title: string, content: string}) => {
+  notification.open({
+    message: title,
+    description: content,
+    onClick: () => {
+      console.log('Notification Clicked!');
+    },
+  });
+};
 
 const Home = () => {
   const getItem = localStorage.getItem(KeyStogare.CHOOSE_ITEM);
@@ -40,9 +51,10 @@ const Home = () => {
   const navigate = useNavigate();
   const [chooseItem, setChooseItem] = useState<DeviceT | null>(choosedItem);
   const [dataFirebaseConnected, setDataFirebaseConnected] = useState<any>(null);
-  const { loading, data } = useSelector((state: RootState) => state.device);
+  const { loading, data, deleteSuccess } = useSelector((state: RootState) => state.device);
   const { token: tokenAcc } = useSelector((state: RootState) => state.auth);
   const [dataDevices, setDataDevices] = useState<DeviceT[] | null>(null);
+  const [itemDelete, setItemDelete] = useState<DeviceT | null>(null);
   const [listItem, setListItem] = useState([
     {
       title: "Thời gian sử dụng: ",
@@ -53,6 +65,34 @@ const Home = () => {
       value: "0 KWH",
     },
   ]);
+  const [visible, setVisible] = useState(false);
+  const [confirmLoading, setConfirmLoading] = useState(false);
+  const [modalText, setModalText] = useState("");
+
+  const showModal = (item: DeviceT) => {
+    setItemDelete(item);
+    setModalText("Bạn có chắn chắn muốn xóa " + item.deviceName + " " + "ra khỏi tài khoản của bạn!")
+    setVisible(true);
+  };
+
+  const handleOk = () => {
+    if (itemDelete) {
+      setModalText('Thiết bị sẽ được xóa trong 2s');
+      setConfirmLoading(true);
+      localStorage.removeItem(KeyStogare.CHOOSE_ITEM);
+      setTimeout(() => {
+        dispatch(deleteDevice(itemDelete.deviceId));
+        setVisible(false);
+        setConfirmLoading(false);
+        dispatch(getDevices());
+      }, 2000);
+    }
+   
+  };
+
+  const handleCancel = () => {
+    setVisible(false);
+  };
 
   const handleCheckData = (data?: DeviceT[] | null) => {
     if (!data) {
@@ -138,6 +178,13 @@ const Home = () => {
   };
 
   useEffect(() => {
+    if (deleteSuccess) {
+      openNotification({title: "Đã xóa thiết bị", content: "Thiết bị đã bị xóa, bạn có thể keert nối lại bằng điện thoại"});
+      dispatch(resetDeleteDevice());
+    }
+  }, [deleteSuccess])
+
+  useEffect(() => {
     dispatch(getDevices());
   }, []);
 
@@ -149,6 +196,13 @@ const Home = () => {
         KeyStogare.CHOOSE_ITEM,
         JSON.stringify(dataReceiver[0])
       );
+        
+      if (itemDelete) {
+        dataReceiver[0].id !== chooseItem?.id &&
+        setChooseItem(dataReceiver[0]);
+        setItemDelete(null);
+      }
+      
       !localStorage.getItem(KeyStogare.CHOOSE_ITEM) &&
         dataReceiver[0].id !== chooseItem?.id &&
         setChooseItem(dataReceiver[0]);
@@ -234,6 +288,15 @@ const Home = () => {
 
   return (
     <div className="body-home">
+       <Modal
+        title="Xóa thiết bị khỏi tài khoản"
+        visible={visible}
+        onOk={handleOk}
+        confirmLoading={confirmLoading}
+        onCancel={handleCancel}
+      >
+        <p>{modalText}</p>
+      </Modal>
       <div className="home">
         <Row>
           <Col xl={12} lg={{ order: 1, span: 12 }} md={15}>
@@ -265,12 +328,22 @@ const Home = () => {
                         : {}),
                     }}
                     actions={[
-                      <Button
+                      <div style={{flexDirection: 'column', display: 'flex'}}>
+                        <Button
                         type="link"
                         onClick={() => handleChooseItem(item)}
                       >
                         Theo dõi thiết bị
-                      </Button>,
+                      </Button>
+                      <Button
+                        type="link"
+                        style={{color: 'red'}}
+                        onClick={() => showModal(item)}
+                        disabled={item.isTurnOn}
+                      >
+                        Xóa
+                      </Button>
+                      </div>,
                       <div>
                         <AlertOutlined
                           className={"icon"}
@@ -287,6 +360,7 @@ const Home = () => {
                       description={
                         "Thiết bị đang " + (item?.isTurnOn ? "bật" : "tắt")
                       }
+                      style={{padding: "0 8px"}}
                     />
                   </List.Item>
                 )}

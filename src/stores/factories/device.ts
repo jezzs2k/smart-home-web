@@ -7,6 +7,7 @@ import {
   start,
   uploadDeviceSuccess,
   deviceById,
+  deleteDeivece,
 } from "../device";
 import { AppDispatch } from "../stores";
 
@@ -122,3 +123,31 @@ export const upLoadDevices =
       dispatch(reject({ error: error }));
     }
   };
+
+export const deleteDevice =
+  (deviceId: string) => async (dispatch: AppDispatch) => {
+    const token = localStorage.getItem(KeyStogare.Token);
+
+    let config = {
+      headers: {
+        Authorization: "Bearer " + token,
+      },
+    };
+
+    dispatch(start());
+    try {
+      const result: AxiosResponse<DeviceT> = await axiosInstance.delete(
+        "/devices" + "/" + deviceId,
+        config
+      );
+
+      if (result) {
+        dispatch(deleteDeivece());
+      } else {
+        dispatch(reject({ error: "Internal Server" }));
+      }
+    } catch (error) {
+      dispatch(reject({ error: error }));
+    }
+  };
+
