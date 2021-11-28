@@ -2,8 +2,7 @@ import { AxiosResponse } from "axios";
 import { axiosInstance } from "../../utils";
 import { reject, resolves, start } from "../timeOut";
 import { AppDispatch } from "../stores";
-import { KeyStogare } from "../../config/KeyStorage";
-
+import { getToken } from "../../config/stores/getToken";
 export interface CreateWorkerRespone {
   success: Boolean;
 }
@@ -12,10 +11,9 @@ export const createTimeOut =
   ({ deviceId, seconds }: { deviceId: string; seconds: number }) =>
   async (dispatch: AppDispatch) => {
     dispatch(start());
+    const token = await getToken();
 
     try {
-      const token = localStorage.getItem(KeyStogare.Token);
-
       let config = {
         headers: {
           Authorization: "Bearer " + token,
@@ -39,10 +37,8 @@ export const cancelTimeOut =
   ({ deviceId }: { deviceId: string }) =>
   async (dispatch: AppDispatch) => {
     dispatch(start());
-
+    const token = await getToken();
     try {
-      const token = localStorage.getItem(KeyStogare.Token);
-
       let config = {
         headers: {
           Authorization: "Bearer " + token,
@@ -66,10 +62,9 @@ export const checkTimeOut =
   ({ deviceId }: { deviceId: string }) =>
   async (dispatch: AppDispatch) => {
     dispatch(start());
+    const token = await getToken();
 
     try {
-      const token = localStorage.getItem(KeyStogare.Token);
-
       let config = {
         headers: {
           Authorization: "Bearer " + token,

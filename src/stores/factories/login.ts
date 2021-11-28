@@ -1,8 +1,8 @@
 import { AxiosResponse } from "axios";
+import { setToken } from "../../config/stores/setToken";
 import { axiosInstance } from "../../utils";
 import { reject, resolves, start } from "../auth";
 import { AppDispatch } from "../stores";
-import { KeyStogare } from "../../config/KeyStorage";
 
 export interface LoginRespone {
   token: string;
@@ -35,7 +35,7 @@ export const login =
       );
 
       if (result?.data?.token) {
-        localStorage.setItem(KeyStogare.Token, result.data.token);
+        await setToken(result.data.token);
 
         dispatch(
           resolves({ user: result.data.user, token: result.data.token })

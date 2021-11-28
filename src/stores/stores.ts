@@ -11,12 +11,12 @@ import {
   PURGE,
   REGISTER,
 } from "redux-persist";
-import storage from "redux-persist/lib/storage";
 
 import authReducer from "./auth";
 import deviceReducer from "./device";
 import userReducer from "./user";
 import timeOutReducer from "./timeOut";
+import { persistConfig } from "../config/stores/persistConfig";
 
 export type RootState = ReturnType<typeof store.getState>;
 
@@ -26,12 +26,6 @@ const reducer = combineReducers({
   user: userReducer,
   timeOut: timeOutReducer,
 });
-
-const persistConfig = {
-  key: "root",
-  storage: storage,
-  whitelist: ["auth"],
-};
 
 const persistedReducer = persistReducer(persistConfig, reducer);
 

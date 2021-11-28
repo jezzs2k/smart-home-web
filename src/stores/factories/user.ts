@@ -2,7 +2,7 @@ import { AxiosResponse } from "axios";
 import { axiosInstance } from "../../utils";
 import { reject, resolves, start } from "../user";
 import { AppDispatch } from "../stores";
-import { KeyStogare } from "../../config/KeyStorage";
+import { getToken } from "../../config/stores/getToken";
 
 export interface WorkerT {
   isRunning: boolean;
@@ -39,7 +39,7 @@ export const updateUsers =
     dispatch(start());
 
     try {
-      const token = localStorage.getItem(KeyStogare.Token);
+      const token = await getToken();
 
       let config = {
         headers: {
@@ -85,7 +85,7 @@ export const getUser = () => async (dispatch: AppDispatch) => {
   dispatch(start());
 
   try {
-    const token = localStorage.getItem(KeyStogare.Token);
+    const token = await getToken();
 
     let config = {
       headers: {

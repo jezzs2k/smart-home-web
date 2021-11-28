@@ -4,7 +4,11 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "serve": "vite preview --port 8080"
+    "serve": "vite preview --port 8080",
+    "update_redux": "yarn delete_redux_global && cp -rf ./src/stores ../redux/stores",
+    "copy_redux": "yarn delete_redux && cp -rf ../redux/stores ./src/stores",
+    "delete_redux": "rm -rf ./src/stores",
+    "delete_redux_global": "rm -rf ../redux/stores"
   },
   "dependencies": {
     "@ant-design/icons": "4.7.0",

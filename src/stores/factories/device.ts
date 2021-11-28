@@ -1,4 +1,3 @@
-import { KeyStogare } from "./../../config/KeyStorage";
 import { AxiosResponse } from "axios";
 import { axiosInstance } from "../../utils";
 import {
@@ -10,6 +9,7 @@ import {
   deleteDeivece,
 } from "../device";
 import { AppDispatch } from "../stores";
+import { getToken } from "../../config/stores/getToken";
 
 export interface DeviceT {
   isConnected: boolean;
@@ -39,8 +39,7 @@ export interface CreatedBy {
 }
 
 export const getDevices = () => async (dispatch: AppDispatch) => {
-  const token = localStorage.getItem(KeyStogare.Token);
-
+  const token = await getToken();
   let config = {
     headers: {
       Authorization: "Bearer " + token,
@@ -55,6 +54,8 @@ export const getDevices = () => async (dispatch: AppDispatch) => {
     );
 
     if (result) {
+      console.log("result.data ", result.data);
+
       dispatch(resolves({ data: result.data }));
     } else {
       dispatch(reject({ error: "Internal Server" }));
@@ -65,7 +66,7 @@ export const getDevices = () => async (dispatch: AppDispatch) => {
 };
 
 export const getDeviceById = (id: string) => async (dispatch: AppDispatch) => {
-  const token = localStorage.getItem(KeyStogare.Token);
+  const token = await getToken();
 
   let config = {
     headers: {
@@ -98,7 +99,7 @@ export interface DeviceUploadParamsT {
 
 export const upLoadDevices =
   (parmas: DeviceUploadParamsT) => async (dispatch: AppDispatch) => {
-    const token = localStorage.getItem(KeyStogare.Token);
+    const token = await getToken();
 
     let config = {
       headers: {
@@ -126,7 +127,7 @@ export const upLoadDevices =
 
 export const deleteDevice =
   (deviceId: string) => async (dispatch: AppDispatch) => {
-    const token = localStorage.getItem(KeyStogare.Token);
+    const token = await getToken();
 
     let config = {
       headers: {
@@ -150,4 +151,3 @@ export const deleteDevice =
       dispatch(reject({ error: error }));
     }
   };
-
