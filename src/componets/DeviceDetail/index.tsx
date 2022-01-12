@@ -10,9 +10,12 @@ import {
 } from "firebase/database";
 import { Progress, Row, Col, List } from "antd";
 import { Line } from "react-chartjs-2";
+import _ from "lodash";
 
 import "./index.css";
 import useTimeout from "../../hooks/useTimeout";
+
+const HOLD_VALUE = 20;
 
 interface RenderItemT {
   title: string;
@@ -362,11 +365,19 @@ const DeviceDetail = () => {
               <div className="chart-dev">
                 <Line
                   data={{
-                    labels: dataEnergies?.map((item) => "") || [],
+                    labels: _.slice(
+                      dataEnergies?.map((item) => "") || [],
+                      (dataEnergies?.length || HOLD_VALUE) - HOLD_VALUE,
+                      dataEnergies?.length || 0
+                    ),
                     datasets: [
                       {
                         label: "Công suất (W)",
-                        data: dataEnergies?.map((item) => item.power) || [],
+                        data: _.slice(
+                          dataEnergies?.map((item) => item.power) || [],
+                          (dataEnergies?.length || HOLD_VALUE) - HOLD_VALUE,
+                          dataEnergies?.length || 0
+                        ),
                         fill: true,
                         backgroundColor: "#ff638466",
                         borderColor: "rgba(255, 99, 132, 0.2)",
